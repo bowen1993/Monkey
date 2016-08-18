@@ -110,3 +110,23 @@ def p_movement_bad(p):
     p[0] = (False, "Wrong movement setting")
     p.parser.error = 1
 
+def p_compound_action(p):
+    '''compound_action  : repeat_block
+                        | task_block
+    '''
+    lineno = p.lineno(0)
+    p[0] = (lineno, p[1])
+
+def p_repeat_block(p):
+    '''repeat_block : Repeat NUMBER NEWLINE actions End NEWLINE
+                    | Repeat NUMBER NEWLINE compound_action End NEWLINE
+    '''
+    pass
+
+def p_task_block(p):
+    '''task_block   : Task NEWLINE actions End
+                    | Task NEWLINE compound_action End
+    '''
+    pass
+
+#TODO: Judge action
