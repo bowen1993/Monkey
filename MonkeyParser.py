@@ -4,21 +4,40 @@ import MonkeyLex
 tokens = MonkeyLex.tokens
 
 def p_program(p):
-    '''program  : program actions
-                | actions
+    '''program  : program compound_action actions
+                | compound_action actions
+                | program actions
+                | actions 
     '''
-    if len(p) == 2 and p[1]:
-        p[0] = {}
-        line,act = p[1]
-        p[0][line] = act
-    elif len(p) == 3:
+    if len(p) == 4:
         p[0] = p[1]
-        if not p[0]:
+        if not p[0]: p[0] = {}
+        line, act = p[2]
+        p[0][line] = act
+        if p[3] and len(p[3]) > 0:
+            for act_obj in p[3]:
+                nline, nact = act_obj
+                p[0][nline] = nact
+    elif len(p) == 3:
+        if isinstance(p[1], dict):
+            p[0] = p[1]
+            if not p[0]: p[0] = {}
+            if p[2]:
+                for act_obj in p[2]:
+                    line, act = act_obj
+                    p[0][line] = act
+        else:
             p[0] = {}
-        if p[2]:
-            for act_obj in p[2]:
-                line, act = act_obj
-                p[0][line] = act
+            line, act = p[1]
+            p[0][line] = act
+            if p[2] and len(p[2]) > 0:
+                for act_obj in p[2]:
+                    nline, nact = act_obj
+                    p[0][nline] = nact
+    elif len(p) == 2 and p[1]:
+        p[0] = {}
+        line, act = p[1]
+        p[0][line] = act
 
 def p_program_error(p):
     '''program : error '''
@@ -58,8 +77,7 @@ def p_action_target(p):
         p[0] = (lineno, action_dict)
 
 def p_action_command(p):
-    '''
-    action  : movement STRING NEWLINE
+    '''action  : movement STRING NEWLINE
     '''
     if not p[1][0]:
         print("%s At Line %d", (p[1][1], p.lineno(1)))
@@ -73,6 +91,21 @@ def p_action_command(p):
             'type':'command'
         }
         p[0] = (lineno, action_dict)
+
+def p_action_judge(p):
+    '''action   : Judge target NUMBER NEWLINE
+                | Judge target STRING NEWLINE
+                | Judge target Not NUMBER NEWLINE
+                | Judge target Not STRING NEWLINE
+    '''
+    lineno = p.lineno(0)
+    action_dict = {
+        'type': 'judge',
+        'target': p[2],
+        'expect': p[3] if len(p) == 5 else p[4],
+        'is_equal': True if len(p) == 5 else False
+    }
+    p[0] = (lineno, action_dict)
 
 def p_action_empty(p):
     '''action  : NEWLINE
@@ -121,12 +154,31 @@ def p_repeat_block(p):
     '''repeat_block : Repeat NUMBER NEWLINE actions End NEWLINE
                     | Repeat NUMBER NEWLINE compound_action End NEWLINE
     '''
-    pass
+    lineno = p.lineno(0)
+    block_dict = {
+        'type':'repeat',
+        'content':p[4],
+        'times': p[2]
+    }
+    p[0] = (lineno,block_dict)
 
 def p_task_block(p):
-    '''task_block   : Task NEWLINE actions End
-                    | Task NEWLINE compound_action End
+    '''task_block   : Task ID NEWLINE actions End
+                    | Task ID NEWLINE compound_action End
     '''
-    pass
+    lineno = p.lineno(0)
+    block_dict = {
+        'type': 'task',
+        'content': p[4],
+        'name': p[2]
+    }
+    p[0] = (lineno, block_dict)
 
-#TODO: Judge action
+def p_target(p):
+    '''target   : STRING STRING
+                | STRING
+    '''
+    if len(p) == 3:
+        p[0] = p[1] + p[2]
+    elif len(p) == 2:
+        p[0] = p[1]
