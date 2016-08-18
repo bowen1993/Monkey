@@ -39,10 +39,74 @@ def p_actions(p):
             p[0] = []
         p[0].append(p[2])
 
-def p_action(p):
-    '''action   : movement target BOOL
-                | movement target
-                | movement STRING BOOL
-                | movement STRING
+def p_action_target(p):
+    '''action   : movement target BOOL NEWLINE
+                | movement target NEWLINE
     '''
-    pass
+    if not p[1][0]:
+        print("%s At Line %d", (p[1][1], p.lineno(1)))
+        p[0] = None
+        p.parser.error = 1
+    else:
+        lineno = p.lineno(0)
+        action_dict = {
+            'move':p[1][1],
+            'target':p[2],
+            'is_wait': True if p[3] else False,
+            'type':'target'
+        }
+        p[0] = (lineno, action_dict)
+
+def p_action_command(p):
+    '''
+    action  : movement STRING NEWLINE
+    '''
+    if not p[1][0]:
+        print("%s At Line %d", (p[1][1], p.lineno(1)))
+        p[0] = None
+        p.parser.error = 1
+    else:
+        lineno = p.lineno(0)
+        action_dict = {
+            'move': p[1][1],
+            'value':p[2],
+            'type':'command'
+        }
+        p[0] = (lineno, action_dict)
+
+def p_action_empty(p):
+    '''action  : NEWLINE
+    '''
+    p[0] = None
+
+def p_action_bad(p):
+    '''action   : error NEWLINE
+    '''
+    print("Wrong action at line %d" % p.lineno(0))
+    p[0] = None
+    p.parser.error = 1
+
+def p_movement(p):
+    '''movement : Perfer
+                | Patient
+                | Visit
+                | Blind
+                | Click
+                | Input
+                | Choose
+                | Back
+                | Forward
+                | Accept
+                | Auth
+                | Dismiss
+                | Press
+                | Switch
+    '''
+    p[0] = (True, p[1])
+
+def p_movement_bad(p):
+    '''movement : error
+    '''
+    p[0] = (False, "Wrong movement setting")
+    p.parser.error = 1
+
