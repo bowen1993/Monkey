@@ -135,9 +135,7 @@ def p_action_command(p):
 
 
 def p_action_judge(p):
-    '''action   : Judge target NUMBER NEWLINE
-                | Judge target STRING NEWLINE
-                | Judge target Not NUMBER NEWLINE
+    '''action   : Judge target STRING NEWLINE
                 | Judge target Not STRING NEWLINE
     '''
     action_dict = {
@@ -162,7 +160,7 @@ def p_action_bad(p):
     p.parser.error = 1
 
 def p_movement(p):
-    '''movement : Perfer
+    '''movement : Prefer
                 | Patient
                 | Visit
                 | Blind

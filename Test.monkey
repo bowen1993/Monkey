@@ -1,3 +1,5 @@
-Prefer "Chrome"
-Visit "http://google.com"
-
+Prefer "Firefox"
+Visit "http://www.python.org"
+Input "input" "#id-search-field.search-field.placeholder" "pycon"
+Click "button" "#submit"
+Judge "/html/body/" "div/div[3]/div/section/h2" "Search"

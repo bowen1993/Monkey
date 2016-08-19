@@ -1,9 +1,9 @@
 from ply import *
 
 keywords = (
-    'Perfer', 'Patient', 'Visit', 'Blind', 'Click', 'Input', 'Choose',
+    'Prefer', 'Patient', 'Visit', 'Blind', 'Click', 'Input', 'Choose',
     'Back', 'Forward', 'Accept', 'Auth', 'Dismiss', 'Press', 'Switch',
-    'Repeat', 'Task', 'End', 'Judge', 'Empty', 'Not', 'True', 'False'
+    'Repeat', 'Task', 'End', 'Judge', 'Empty', 'Not', 'True', 'False', 'Page'
 )
 
 tokens = keywords + (

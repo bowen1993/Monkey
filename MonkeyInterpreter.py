@@ -11,10 +11,9 @@ class MonkeyInterpreter:
         self._code_init()
     
     def _code_init(self):
-        self.code_str = """
-from selenium import webdriver
+        self.code_str = """from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-        """
+"""
 
     def save(self):
         if len(self.filename) > 0:
@@ -28,8 +27,11 @@ from selenium.webdriver.common.keys import Keys
     def curr_indent(self):
         return '    '*self.indent
 
+    def add_screenshot(self, filename):
+        self.code_str += "driver.get_screenshot_as_file('%s')\n" % filename
+
     def translate(self):
-        for action in self.prog:
+        for index, action in enumerate(self.prog):
             if action['type'] == 'auth':
                 self.code_str += self.transAuth(action)
             elif 'single' in action['type']:
@@ -44,11 +46,14 @@ from selenium.webdriver.common.keys import Keys
                 self.code_str += self.transRepeat(action)
             elif 'task' in action['type']:
                 self.code_str += self.transTask(action)
+            if "driver.get(" in self.code_str:
+                self.add_screenshot("%d.png"%index)
+        self.code_str += "driver.close()"
     
     def transAuth(self, action):
         username = action['username']
         password = action['password']
-        return self.curr_indent() + "driver.switch_to.alert.authenticate('%s','%s')" % (username, password)
+        return "driver.switch_to.alert.authenticate('%s','%s')" % (username, password)
     
     def transSingleAction(self, action):
         move = action['move']
@@ -70,7 +75,7 @@ from selenium.webdriver.common.keys import Keys
     def transCommandAction(self, action):
         move = action['move']
         args = {
-            'value':
+            'value':action['value']
         }
         is_success, stmt_str = globals()[move](**args)
         if is_success:

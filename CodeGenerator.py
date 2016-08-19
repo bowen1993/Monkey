@@ -1,5 +1,5 @@
 def Prefer(value="PhantomJS"):
-    return True, "driver = webdriver.%s()\n" % browser_value
+    return True, "driver = webdriver.%s()\n" % value
 
 def Patient(value=0):
     return True, ""
@@ -25,17 +25,17 @@ def get_find_stmt(target):
     find_stmt = ""
     find_type = judge_target(target)
     if find_type == 'xpath':
-        find_stmt = "ele = driver.find_element_by_xpath('%s')\n" % target
+        find_stmt = "ele = driver.find_element_by_xpath(\"%s\")\n" % target
     elif find_type == 'css':
-        find_stmt = "ele = driver.find_element_by_css_selector('%s')\n" % target
+        find_stmt = "ele = driver.find_element_by_css_selector(\"%s\")\n" % target
     elif find_type == "element":
-        find_stmt = "ele = driver.find_element_by_tag_name('%s')\n" % target
+        find_stmt = "ele = driver.find_element_by_tag_name(\"%s\")\n" % target
     return find_stmt
 
 def Click(target=""):
     if len(target) > 0:
         find_stmt = get_find_stmt(target)
-        return True, "%sele.click()" % find_stmt
+        return True, "%sele.click()\n" % find_stmt
     else:
         return False, "No target"
 

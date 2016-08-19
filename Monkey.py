@@ -9,3 +9,6 @@ if __name__ == '__main__':
         data = open(sys.argv[1], 'r').read()
         prog = MonkeyParser.parse(data, 1)
         print prog
+        mintp = MonkeyInterpreter.MonkeyInterpreter(prog, "Hello.py")
+        mintp.translate()
+        mintp.save()
