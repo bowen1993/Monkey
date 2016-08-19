@@ -3,7 +3,7 @@ from ply import *
 keywords = (
     'Perfer', 'Patient', 'Visit', 'Blind', 'Click', 'Input', 'Choose',
     'Back', 'Forward', 'Accept', 'Auth', 'Dismiss', 'Press', 'Switch',
-    'Repeat', 'Task', 'End', 'Judge', 'Empty', 'Not'
+    'Repeat', 'Task', 'End', 'Judge', 'Empty', 'Not', 'True', 'False'
 )
 
 tokens = keywords + (
@@ -15,7 +15,11 @@ t_ignore = '\t'
 def t_ID(t):
     r'[a-zA-Z][a-zA-Z0-9]*'
     if t.value in keywords:
-        t.type = t.value
+        if t.value == 'True' or t.value == 'False':
+            t.type = 'BOOL'
+            t.value = True if t.value == 'True' else False
+        else:
+            t.type = t.value
     return t
 
 def t_NUMBER(t):
@@ -28,9 +32,16 @@ def t_NEWLINE(t):
     t.lexer.lineno += 1
     return t
 
+def t_STRING(t):
+    r'\".*?\"'
+    t.value = t.value.replace("\"", '')
+    return t
+# t_STRING = r'\".*?\"'
+def t_BOOL(t):
+    r'(True)|(False)'
+    t.value = True if t.value == 'True' else False
+    return t
 
-t_STRING = r'\".*?\"'
-t_BOOL = r'(true)|(false)'
 t_EQUAL = r'='
 
 def t_error(t):
