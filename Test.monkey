@@ -1,4 +1,4 @@
-Prefer "Firefox"
+Prefer "PhantomJS"
 Visit "http://www.python.org"
 Input "input" "#id-search-field.search-field.placeholder" "pycon"
 Click "button" "#submit"
